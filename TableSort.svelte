@@ -4,7 +4,7 @@
     const CLASSNAME_ASC = 'ascending'
     const CLASSNAME_DESC = 'descending'
 
-    import { onMount } from 'svelte'
+    import { onMount, createEventDispatcher } from 'svelte'
     import {
         sortFunction,
         compareStrings,
@@ -16,6 +16,8 @@
 
     let thead
     let sortOrder = [[]]
+
+    const dispatch = createEventDispatcher()
 
     $: sortedItems = sorted([...items], sortOrder)
 
@@ -57,12 +59,20 @@
                 sortOrder = [[fieldName, 0]]
             }
         }
+
+        const currentSortOrder = sortOrder[sortOrder.length - 1][1]
+
         th.className =
             CLASSNAME_SORTABLE +
             ' ' +
-            (sortOrder[sortOrder.length - 1][1]
+            (currentSortOrder
                 ? CLASSNAME_DESC
                 : CLASSNAME_ASC)
+
+        dispatch('sort', {
+            name: fieldName,
+            direction: currentSortOrder ? 'descending': 'ascending'
+        })
     }
 
     function resetClasses() {
